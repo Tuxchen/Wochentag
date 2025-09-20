@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <regex>
 
 enum class Wochentag {
     Sonntag = 0,
@@ -54,22 +55,25 @@ Wochentag calc_day(int t, int m, int j) {
 }
 
 int main(int argc, char** argv) {
-    if(argc < 4) {
-        std::cerr << "Usage: " << argv[0] << " <Tag> <Monat> <Jahr>" << std::endl;
+    if(argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " dd.mm.yyyy" << std::endl;
         return 1;
     }
 
+    std::regex expr(R"(^(\d{2})\.(\d{2})\.(\d{4})$)");
+    std::smatch match;
+    std::string text(argv[1]);
+
     int day{0}, month{0}, year{0};
 
-    try {
-        day = std::stoi(argv[1]);
-        month = std::stoi(argv[2]);
-        year = std::stoi(argv[3]);
-    } catch(std::invalid_argument &e) {
-        std::cerr << "Tag, Monat oder Jahr müssen numerische Werte sein!\n";
-        return 1;
-    } catch(std::out_of_range &e) {
-        std::cerr << "Tag, Monat oder Jahr hat einen zu großen Wert.\n";
+    if(std::regex_match(text, match, expr)) {
+        day = std::stoi(match[1].str());
+        month = std::stoi(match[2].str());
+        year = std::stoi(match[3].str());
+    }
+    else {
+        std::cerr << "Ungültige Eingabe!" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " dd.mm.yyyy" << std::endl;
         return 1;
     }
 
